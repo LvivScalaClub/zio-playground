@@ -2,10 +2,10 @@
 
 ## Social network
 ### Desired Functionality
-  - User Registration
-  - User Authentication & Authorization
-  - Friends: Add/Remove/List
-  - Feed: posts, likes, comments
+  - User Registration                       (Viktor)
+  - User Authentication & Authorization     (Danylo)
+  - Friends: Add/Remove/List                (Vadym)
+  - Feed: posts, likes, comments            (Andriy)
 
 ### High-level components
  - Http-Service: Http4s, guardrail to generate server/client boilerplate

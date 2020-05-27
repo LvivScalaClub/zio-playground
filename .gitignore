@@ -2,4 +2,8 @@
 *.class
 *.log
 project/target
+project/metals.sbt
 target
+.metals
+.bloop
+.vscode

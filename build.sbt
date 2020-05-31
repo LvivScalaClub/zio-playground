@@ -25,8 +25,8 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 
 lazy val root = (project in file("."))
   .settings(
-    organization := "lvivscalaclub",
-    name := "zio-playground",
+    organization := "io.github.socializator",
+    name := "socializator",
     version := "0.0.1",
     scalaVersion := "2.13.2",
     maxErrors := 3,
@@ -45,7 +45,7 @@ lazy val root = (project in file("."))
       Pureconfig
     ),
     Compile / guardrailTasks += ScalaServer(
-      baseDirectory.value / "openapi.yaml",
+      baseDirectory.value / "apispec.yaml",
       "io.github.socializator.generated.server",
       framework = "http4s"
     )

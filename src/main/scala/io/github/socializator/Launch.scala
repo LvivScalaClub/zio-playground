@@ -14,18 +14,13 @@ import io.github.socializator.configuration.Configuration
 import io.github.socializator.generated.server.pets.PetsResource
 import io.github.socializator.controller.PetsController
 import zio.logging._
-import zio.logging.slf4j._
 import io.github.socializator.configuration.ApiConfig
+import io.github.socializator.logging.AppLogging
 
 object Launch extends zio.App {
-  type AppEnvironment = Configuration with Clock
+  // Clock is implicitly converted to cats.effect.IO.timer needed for http4s
+  type AppEnvironment = Configuration with Logging with Clock
   type AppTask[A]     = RIO[AppEnvironment, A]
-
-  val liveLogger =
-    Slf4jLogger.make(
-      logFormat = (context, line) => line,
-      rootLoggerName = None
-    )
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, zio.ExitCode] = {
 
@@ -38,8 +33,7 @@ object Launch extends zio.App {
     } yield server
 
     program
-      .provideSomeLayer[ZEnv](Configuration.live ++ liveLogger)
-      .tapError(err => putStrLn(s"Execution failed with: $err"))
+      .provideSomeLayer[ZEnv](Configuration.live ++ AppLogging.live)
       .exitCode
   }
 

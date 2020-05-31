@@ -10,26 +10,26 @@ import zio.clock.Clock
 import zio.console.putStrLn
 import zio.interop.catz._
 import cats.effect.{ExitCode => CatsExitCode}
-import io.github.socializator.configuration.Configuration
 import io.github.socializator.generated.server.pets.PetsResource
 import io.github.socializator.controller.PetsController
 import zio.logging._
-import io.github.socializator.configuration.ApiConfig
+import zio.config.{config, Config}
+import io.github.socializator.configuration._
 import io.github.socializator.logging.AppLogging
 
 object Launch extends zio.App {
   // Clock is implicitly converted to cats.effect.IO.timer needed for http4s
-  type AppEnvironment = Configuration with Logging with Clock
+  type AppEnvironment = Config[AppConfig] with Logging with Clock
   type AppTask[A]     = RIO[AppEnvironment, A]
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, zio.ExitCode] = {
 
     val program = for {
-      apiConfig <- configuration.apiConfig
+      appConfig <- config[AppConfig]
       _ <- log.info(
-        s"Starting server at http://${apiConfig.host}:${apiConfig.port} ..."
+        s"Starting server at http://${appConfig.api.host}:${appConfig.api.port} ..."
       )
-      server <- runHttpServer(apiConfig)
+      server <- runHttpServer(appConfig.api)
     } yield server
 
     program

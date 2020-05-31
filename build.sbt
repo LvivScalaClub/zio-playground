@@ -4,8 +4,8 @@ val Http4sVersion = "0.21.3"
 val CirceVersion = "0.13.0"
 val LogbackVersion = "1.2.3"
 val ZioInteropCatsVersion = "2.1.3.0-RC15"
-val PureconfigVersion = "0.12.3"
 val ZioLoggingVersion = "0.3.0"
+val ZioConfigVersion = "1.0.0-RC20"
 
 lazy val Http4sBlazeServer = "org.http4s" %% "http4s-blaze-server" % Http4sVersion
 lazy val Http4sClient = "org.http4s" %% "http4s-client" % Http4sVersion
@@ -16,9 +16,11 @@ lazy val Zio =  "dev.zio" %% "zio" % ZioVersion
 lazy val ZioInteropCats =  "dev.zio" %% "zio-interop-cats" % ZioInteropCatsVersion
 lazy val Specs2Core = "org.specs2" %% "specs2-core" % Specs2Version % "test"
 lazy val LogbackClassic = "ch.qos.logback"  %  "logback-classic"  % LogbackVersion
-lazy val Pureconfig = "com.github.pureconfig" %% "pureconfig" % PureconfigVersion
 lazy val ZioLogging = "dev.zio" %% "zio-logging" % ZioLoggingVersion
 lazy val ZioLoggingSlf4j = "dev.zio" %% "zio-logging-slf4j" % ZioLoggingVersion
+lazy val ZioConfig = "dev.zio" %% "zio-config" % ZioConfigVersion
+lazy val ZioConfigTypesafe = "dev.zio" %% "zio-config-typesafe" % ZioConfigVersion
+lazy val ZioConfigMagnolia = "dev.zio" %% "zio-config-magnolia" % ZioConfigVersion
 
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
@@ -35,14 +37,16 @@ lazy val root = (project in file("."))
       ZioInteropCats,
       ZioLogging,
       ZioLoggingSlf4j,
+      ZioConfig,
+      ZioConfigTypesafe,
+      ZioConfigMagnolia,
       Specs2Core,
       CirceGeneric,
       Http4sBlazeServer,
       Http4sClient,
       Http4sCirce,
       Http4sDsl,
-      LogbackClassic,
-      Pureconfig
+      LogbackClassic
     ),
     Compile / guardrailTasks += ScalaServer(
       baseDirectory.value / "apispec.yaml",

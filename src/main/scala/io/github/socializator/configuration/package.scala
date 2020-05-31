@@ -1,24 +1,22 @@
 package io.github.socializator
 
-import pureconfig.{ConfigSource, loadConfigOrThrow}
 import zio._
+import zio.config.{config, Config}
+import zio.config.typesafe._
+import zio.config.syntax._
+import zio.config.magnolia.DeriveConfigDescriptor
 
 package object configuration {
-  type Configuration = Has[ApiConfig] with Has[DbConfig]
-
-  case class AppConfig(api: ApiConfig, dbConfig: DbConfig)
+  case class AppConfig(api: ApiConfig, database: DatabaseConfig)
   case class ApiConfig(host: String, port: Int)
-  case class DbConfig(url: String, user: String, password: String)
+  case class DatabaseConfig(url: String, user: String, password: String)
 
-  val apiConfig: URIO[Has[ApiConfig], ApiConfig] = ZIO.access(_.get)
-  val dbConfig:  URIO[Has[DbConfig],  DbConfig]  = ZIO.access(_.get)
+  // components have only required dependencies
+  val api: URLayer[Has[AppConfig], Has[ApiConfig]]           = ZLayer.fromService(_.api)
+  val database: URLayer[Has[AppConfig], Has[DatabaseConfig]] = ZLayer.fromService(_.database)
 
   object Configuration {
-    import pureconfig.generic.auto._
-    val live: Layer[Throwable, Configuration] = ZLayer.fromEffectMany(
-      Task
-        .effect(ConfigSource.default.loadOrThrow[AppConfig])
-        .map(c => Has(c.api) ++ Has(c.dbConfig))
-    )
+    val configDescription = DeriveConfigDescriptor.descriptor[AppConfig]
+    val live              = TypesafeConfig.fromDefaultLoader(configDescription)
   }
 }

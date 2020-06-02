@@ -1,36 +1,56 @@
-val ZioVersion = "1.0.0-RC19-2"
+val ZioVersion = "1.0.0-RC20"
 val Specs2Version = "4.7.0"
-val http4sVersion = "0.21.3"
-val circeVersion = "0.13.0"
+val Http4sVersion = "0.21.3"
+val CirceVersion = "0.13.0"
+val LogbackVersion = "1.2.3"
+val ZioInteropCatsVersion = "2.1.3.0-RC15"
+val ZioLoggingVersion = "0.3.0"
+val ZioConfigVersion = "1.0.0-RC20"
 
-lazy val http4s = "org.http4s" %% "http4s-blaze-server" % http4sVersion
-lazy val http4sBlazeClient = "org.http4s" %% "http4s-blaze-client" % http4sVersion
-lazy val http4sCirce = "org.http4s" %% "http4s-circe" % http4sVersion
-lazy val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
-lazy val circeGeneric = "io.circe" %% "circe-generic" % circeVersion
+lazy val Http4sBlazeServer = "org.http4s" %% "http4s-blaze-server" % Http4sVersion
+lazy val Http4sClient = "org.http4s" %% "http4s-client" % Http4sVersion
+lazy val Http4sCirce = "org.http4s" %% "http4s-circe" % Http4sVersion
+lazy val Http4sDsl = "org.http4s" %% "http4s-dsl" % Http4sVersion
+lazy val CirceGeneric = "io.circe" %% "circe-generic" % CirceVersion
+lazy val Zio =  "dev.zio" %% "zio" % ZioVersion
+lazy val ZioInteropCats =  "dev.zio" %% "zio-interop-cats" % ZioInteropCatsVersion
+lazy val Specs2Core = "org.specs2" %% "specs2-core" % Specs2Version % "test"
+lazy val LogbackClassic = "ch.qos.logback"  %  "logback-classic"  % LogbackVersion
+lazy val ZioLogging = "dev.zio" %% "zio-logging" % ZioLoggingVersion
+lazy val ZioLoggingSlf4j = "dev.zio" %% "zio-logging-slf4j" % ZioLoggingVersion
+lazy val ZioConfig = "dev.zio" %% "zio-config" % ZioConfigVersion
+lazy val ZioConfigTypesafe = "dev.zio" %% "zio-config-typesafe" % ZioConfigVersion
+lazy val ZioConfigMagnolia = "dev.zio" %% "zio-config-magnolia" % ZioConfigVersion
 
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 lazy val root = (project in file("."))
   .settings(
-    organization := "lvivscalaclub",
-    name := "zio-playground",
+    organization := "io.github.socializator",
+    name := "socializator",
     version := "0.0.1",
     scalaVersion := "2.13.2",
     maxErrors := 3,
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % ZioVersion,
-      "org.specs2" %% "specs2-core" % Specs2Version % "test",
-      circeGeneric,
-      http4s,
-      http4sBlazeClient,
-      http4sCirce,
-      http4sDsl
+      Zio,
+      ZioInteropCats,
+      ZioLogging,
+      ZioLoggingSlf4j,
+      ZioConfig,
+      ZioConfigTypesafe,
+      ZioConfigMagnolia,
+      Specs2Core,
+      CirceGeneric,
+      Http4sBlazeServer,
+      Http4sClient,
+      Http4sCirce,
+      Http4sDsl,
+      LogbackClassic
     ),
     Compile / guardrailTasks += ScalaServer(
-      baseDirectory.value / "openapi.yaml",
-      "com.scalaclub.server.external",
+      baseDirectory.value / "apispec.yaml",
+      "io.github.socializator.generated.server",
       framework = "http4s"
     )
   )

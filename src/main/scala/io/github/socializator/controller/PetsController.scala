@@ -10,14 +10,14 @@ import io.github.socializator.generated.server.definitions.Pet
 import java.util.concurrent.atomic.AtomicLong
 
 class PetsController[F[_]: Applicative]() extends PetsHandler[F] {
-  private val IdSeq = new AtomicLong(0)
+  private val IdSeq   = new AtomicLong(0)
   private val storage = scala.collection.mutable.Map.empty[Long, Pet]
 
   override def createPets(
       respond: CreatePetsResponse.type
   )(): F[CreatePetsResponse] = {
     val id = IdSeq.incrementAndGet()
-    storage += id -> Pet(1, s"Pet$id", tag = Some(s"tag$id"))
+    storage += id -> Pet(id, s"Pet$id", tag = Some(s"tag$id"))
     (respond.Created: CreatePetsResponse).pure[F]
   }
 

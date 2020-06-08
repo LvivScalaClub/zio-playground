@@ -9,7 +9,7 @@ import zio.config.magnolia.DeriveConfigDescriptor
 package object configuration {
   case class AppConfig(api: ApiConfig, database: DatabaseConfig)
   case class ApiConfig(host: String, port: Int)
-  case class DatabaseConfig(url: String, user: String, password: String)
+  case class DatabaseConfig(driver: String, url: String, user: String, password: String)
 
   // components have only required dependencies
   val api: URLayer[Has[AppConfig], Has[ApiConfig]]           = ZLayer.fromService(_.api)

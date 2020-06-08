@@ -12,7 +12,6 @@ import zio.console.putStrLn
 import zio.interop.catz._
 import cats.effect.{ExitCode => CatsExitCode}
 import io.github.socializator.generated.server.pets.PetsResource
-import io.github.socializator.controller.PetsController
 import zio.logging._
 import zio.config.{config, Config}
 import io.github.socializator.configuration._
@@ -36,7 +35,6 @@ object Launch extends zio.App {
         s"Starting server at http://${appConfig.api.host}:${appConfig.api.port} ..."
       )
       val httpApp = (
-          //new PetsResource[AppTask]().routes(new PetsController[AppTask]())
           PetsApi.routes[AppEnvironment]
       ).orNotFound
       server <- runHttpServer(httpApp, appConfig.api)
@@ -51,10 +49,6 @@ object Launch extends zio.App {
 
   private def runHttpServer[R <: Clock](httpApp: HttpApp[RIO[R, *]], apiConfig: ApiConfig): ZIO[R, Throwable, Unit] = {
     type HttpAppTask[A] = RIO[R, A]
-    // val httpApp = (
-    //   //new PetsResource[AppTask]().routes(new PetsController[AppTask]())
-    //   PetsApi.routes[AppEnvironment]
-    // ).orNotFound
 
     ZIO.runtime[R].flatMap { implicit rts =>
       BlazeServerBuilder[HttpAppTask]

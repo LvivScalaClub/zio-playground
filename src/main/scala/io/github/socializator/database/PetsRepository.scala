@@ -9,6 +9,8 @@ import io.github.socializator.generated.server.definitions.Pet
 import zio._
 import zio.interop.catz._
 import doobie.util.transactor
+import io.getquill.{idiom => _, _}
+import doobie.quill.DoobieContext
 
 final class PetsRepository(transactor: Transactor[Task]) {
   val service = new PetsRepository.Service {
@@ -29,9 +31,21 @@ object PetsRepository extends Serializable {
   }
 
   object SQL {
-    def insert(name: String, tag: Option[String]): ConnectionIO[Pet] =
-      sql"""INSERT INTO pets (name, tag) VALUES (${name}, ${tag})""".update
-        .withUniqueGeneratedKeys[Pet]("id", "name", "tag")
+    val dc = new DoobieContext.Postgres(Literal) // Literal naming scheme
+    import dc._
+
+    def insert(name: String, tag: Option[String]): ConnectionIO[Pet] = {
+      val petToInsert = Pet(0, name, tag)
+      val q = quote {
+        query[Pet]
+          .insert(lift(petToInsert))
+          .returningGenerated(_.id)
+      }
+
+      run(q).map(id => petToInsert.copy(id = id))
+    }
+    // sql"""INSERT INTO pets (name, tag) VALUES (${name}, ${tag})""".update
+    //   .withUniqueGeneratedKeys[Pet]("id", "name", "tag")
   }
 
   val live: URLayer[Has[Transactor[Task]], Has[PetsRepository.Service]] = ZLayer.fromService {

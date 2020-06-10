@@ -31,6 +31,7 @@ lazy val Postgresql        = "org.postgresql" % "postgresql"          % Postgres
 lazy val DoobieCore        = "org.tpolecat"  %% "doobie-core"         % DoobieVersion
 lazy val DoobieHikari      = "org.tpolecat"  %% "doobie-hikari"       % DoobieVersion
 lazy val DoobiePostgres    = "org.tpolecat"  %% "doobie-postgres"     % DoobieVersion
+lazy val DoobieQuill       = "org.tpolecat"  %% "doobie-quill"        % DoobieVersion
 lazy val DoobieScalatest   = "org.tpolecat"  %% "doobie-scalatest"    % DoobieVersion % Test
 lazy val FlywayCore        = "org.flywaydb"   % "flyway-core"         % FlywayVersion
 lazy val CatsEffect        = "org.typelevel" %% "cats-effect"         % CatsEffectVersion
@@ -66,6 +67,7 @@ lazy val root = (project in file("."))
       DoobieCore,
       DoobieHikari,
       DoobiePostgres,
+      DoobieQuill,
       DoobieScalatest,
       FlywayCore,
       CatsEffect,
@@ -80,7 +82,6 @@ lazy val root = (project in file("."))
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
   )
-
 
 // Refine scalac params from tpolecat
 scalacOptions --= Seq(

@@ -17,6 +17,8 @@ lazy val Http4sCirce       = "org.http4s"    %% "http4s-circe"        % Http4sVe
 lazy val Http4sDsl         = "org.http4s"    %% "http4s-dsl"          % Http4sVersion
 lazy val CirceGeneric      = "io.circe"      %% "circe-generic"       % CirceVersion
 lazy val Zio               = "dev.zio"       %% "zio"                 % ZioVersion
+lazy val ZioTest           = "dev.zio"       %% "zio-test"            % ZioVersion    % Test
+lazy val ZioTestSbt        = "dev.zio"       %% "zio-test-sbt"        % ZioVersion    % Test
 lazy val ZioInteropCats    = "dev.zio"       %% "zio-interop-cats"    % ZioInteropCatsVersion
 lazy val Specs2Core        = "org.specs2"    %% "specs2-core"         % Specs2Version % Test
 lazy val LogbackClassic    = "ch.qos.logback" % "logback-classic"     % LogbackVersion
@@ -45,6 +47,8 @@ lazy val root = (project in file("."))
     maxErrors := 3,
     libraryDependencies ++= Seq(
       Zio,
+      ZioTest,
+      ZioTestSbt,
       ZioInteropCats,
       ZioLogging,
       ZioLoggingSlf4j,
@@ -73,8 +77,10 @@ lazy val root = (project in file("."))
       baseDirectory.value / "apispec.yaml",
       "io.github.socializator.generated.server",
       framework = "http4s"
-    )
+    ),
+    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
   )
+
 
 // Refine scalac params from tpolecat
 scalacOptions --= Seq(

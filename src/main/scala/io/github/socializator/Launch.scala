@@ -1,6 +1,7 @@
 package io.github.socializator
 
 import org.http4s.implicits._
+import org.http4s.HttpApp
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.middleware.CORS
@@ -11,43 +12,50 @@ import zio.console.putStrLn
 import zio.interop.catz._
 import cats.effect.{ExitCode => CatsExitCode}
 import io.github.socializator.generated.server.pets.PetsResource
-import io.github.socializator.controller.PetsController
 import zio.logging._
 import zio.config.{config, Config}
 import io.github.socializator.configuration._
 import io.github.socializator.logging.AppLogging
+import io.github.socializator.database._
+import io.github.socializator.controller.PetsApi
+import doobie.util.transactor.Transactor
+import io.github.socializator.Layers
 
 object Launch extends zio.App {
   // Clock is implicitly converted to cats.effect.IO.timer needed for http4s
-  type AppEnvironment = Config[AppConfig] with Logging with Clock
+  type AppEnvironment = Layers.AppEnv with Clock with Blocking
   type AppTask[A]     = RIO[AppEnvironment, A]
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, zio.ExitCode] = {
 
     val program = for {
       appConfig <- config[AppConfig]
+      _         <- migrateDatabaseSchema(appConfig.database)
       _ <- log.info(
         s"Starting server at http://${appConfig.api.host}:${appConfig.api.port} ..."
       )
-      server <- runHttpServer(appConfig.api)
+      val httpApp = (
+          PetsApi.routes[AppEnvironment]
+      ).orNotFound
+      server <- runHttpServer(httpApp, appConfig.api)
     } yield server
 
     program
-      .provideSomeLayer[ZEnv](Configuration.live ++ AppLogging.live)
+      .provideSomeLayer[ZEnv](
+        Layers.live.AppLayer
+      )
       .exitCode
   }
 
-  private def runHttpServer(apiConfig: ApiConfig): ZIO[AppEnvironment, Throwable, Unit] = {
-    val httpApp = (
-      new PetsResource[AppTask]().routes(new PetsController[AppTask]())
-    ).orNotFound
+  private def runHttpServer[R <: Clock](httpApp: HttpApp[RIO[R, *]], apiConfig: ApiConfig): ZIO[R, Throwable, Unit] = {
+    type HttpAppTask[A] = RIO[R, A]
 
-    ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
-      BlazeServerBuilder[AppTask]
+    ZIO.runtime[R].flatMap { implicit rts =>
+      BlazeServerBuilder[HttpAppTask]
         .bindHttp(apiConfig.port, apiConfig.host)
         .withHttpApp(CORS(httpApp))
         .serve
-        .compile[AppTask, AppTask, CatsExitCode]
+        .compile[HttpAppTask, HttpAppTask, CatsExitCode]
         .drain
     }
   }

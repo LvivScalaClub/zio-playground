@@ -6,6 +6,7 @@ import org.http4s._
 import io.github.socializator.generated.server.pets.PetsHandler
 import io.github.socializator.generated.server.pets.PetsResource
 import io.github.socializator.database.PetsRepository
+import io.github.socializator.generated.server.definitions.PetPostDTO
 import io.github.socializator.generated.server.pets.CreatePetsResponse
 import io.github.socializator.generated.server.pets.ListPetsResponse
 import io.github.socializator.generated.server.pets.ShowPetByIdResponse
@@ -16,17 +17,20 @@ object PetsApi {
     type AppTask[A] = RIO[R, A]
 
     val handler = new PetsHandler[AppTask] {
-      def createPets(
-          respond: CreatePetsResponse.type
-      )(): AppTask[CreatePetsResponse] = {
-        PetsRepository.insert("name", Some("tag")).map(_ => respond.Created)
+      def createPets(respond: CreatePetsResponse.type)(body: PetPostDTO): AppTask[CreatePetsResponse] = {
+        PetsRepository.insert(body).map(CreatePetsResponse.Created)
       }
+
       def listPets(respond: ListPetsResponse.type)(
           limit: Option[Int]
       ): AppTask[ListPetsResponse] = ???
-      def showPetById(respond: ShowPetByIdResponse.type)(
-          petId: String
-      ): AppTask[ShowPetByIdResponse] = ???
+
+      def showPetById(respond: ShowPetByIdResponse.type)(petId: BigInt): AppTask[ShowPetByIdResponse] = {
+        PetsRepository.get(petId.longValue).map {
+          case Some(value) => ShowPetByIdResponse.Ok(value)
+          case None        => ShowPetByIdResponse.BadRequest(s"Pet was not found for id: $petId")
+        }
+      }
     }
 
     new PetsResource[AppTask]().routes(handler)

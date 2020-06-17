@@ -36,9 +36,19 @@ paths:
       summary: Create a pet
       operationId: createPets
       x-jvm-package: pets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetPostDTO'
       responses:
-        '201':
-          description: Null response
+        201:
+          description: post success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
   /pets/{petId}:
     get:
       summary: Info for a specific pet
@@ -50,7 +60,7 @@ paths:
           required: true
           description: The id of the pet to retrieve
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Expected response to a valid request
@@ -58,6 +68,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Pet"
+        '400':
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                type: string
 components:
   schemas:
     Pet:
@@ -69,6 +85,15 @@ components:
         id:
           type: integer
           format: int64
+        name:
+          type: string
+        tag:
+          type: string
+    PetPostDTO:
+      type: object
+      required:
+        - name
+      properties:
         name:
           type: string
         tag:

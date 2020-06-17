@@ -2,40 +2,31 @@ package io.github.socializator.database
 
 import doobie._
 import doobie.implicits._
-import cats._
-import cats.effect._
-import cats.implicits._
-import io.github.socializator.generated.server.definitions.Pet
+import doobie.quill.DoobieContext.Postgres
+import io.github.socializator.generated.server.definitions.{Pet, PetPostDTO}
 import zio._
 import zio.interop.catz._
-import doobie.util.transactor
 import io.getquill.{idiom => _, _}
-import doobie.quill.DoobieContext
 
-final class PetsRepository(transactor: Transactor[Task]) {
+final class PetsRepository(transactor: Transactor[Task], doobieContext: Postgres[Literal]) {
   val service = new PetsRepository.Service {
-    def insert(name: String, tag: Option[String]): Task[Pet] = {
-      PetsRepository.SQL
-        .insert(name, tag)
+    def insert(body: PetPostDTO): Task[Pet] = {
+      SQL
+        .insert(body)
         .transact(transactor)
     }
-  }
-}
+    def get(id: Long): Task[Option[Pet]] = {
+      SQL.get(id).transact(transactor)
+    }
 
-object PetsRepository extends Serializable {
-  def insert(name: String, tag: Option[String]): RIO[Has[PetsRepository.Service], Pet] =
-    ZIO.accessM(_.get.insert(name, tag))
-
-  trait Service extends Serializable {
-    def insert(name: String, tag: Option[String]): Task[Pet]
   }
 
   object SQL {
-    val dc = new DoobieContext.Postgres(Literal) // Literal naming scheme
-    import dc._
 
-    def insert(name: String, tag: Option[String]): ConnectionIO[Pet] = {
-      val petToInsert = Pet(0, name, tag)
+    import doobieContext._
+
+    def insert(body: PetPostDTO): ConnectionIO[Pet] = {
+      val petToInsert = Pet(0, body.name, body.tag)
       val q = quote {
         query[Pet]
           .insert(lift(petToInsert))
@@ -44,12 +35,36 @@ object PetsRepository extends Serializable {
 
       run(q).map(id => petToInsert.copy(id = id))
     }
-    // sql"""INSERT INTO pets (name, tag) VALUES (${name}, ${tag})""".update
-    //   .withUniqueGeneratedKeys[Pet]("id", "name", "tag")
+
+    def get(id: Long): doobie.ConnectionIO[Option[Pet]] = {
+      val q = quote {
+        query[Pet]
+          .filter(_.id == lift(id))
+      }
+      run(q).map(_.headOption)
+    }
   }
 
-  val live: URLayer[Has[Transactor[Task]], Has[PetsRepository.Service]] = ZLayer.fromService {
-    transactor: Transactor[Task] =>
-      new PetsRepository(transactor).service
+}
+
+object PetsRepository extends Serializable {
+  def insert(body: PetPostDTO): RIO[Has[PetsRepository.Service], Pet] =
+    ZIO.accessM(_.get.insert(body))
+
+  def get(id: Long): RIO[Has[PetsRepository.Service], Option[Pet]] =
+    ZIO.accessM(_.get.get(id))
+
+  trait Service extends Serializable {
+    def insert(body: PetPostDTO): Task[Pet]
+
+    def get(id: Long): Task[Option[Pet]]
+  }
+
+  val live: URLayer[Has[Transactor[Task]] with Has[Postgres[Literal]], Has[PetsRepository.Service]] = {
+    val service = for {
+      transactor      <- ZIO.access[Has[Transactor[Task]]](_.get)
+      postgresContext <- ZIO.access[Has[Postgres[Literal]]](_.get)
+    } yield new PetsRepository(transactor, postgresContext).service
+    service.toLayer
   }
 }

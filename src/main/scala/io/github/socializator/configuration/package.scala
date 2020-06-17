@@ -16,7 +16,8 @@ package object configuration {
   // components have only required dependencies
   val api: URLayer[Has[AppConfig], Has[ApiConfig]]           = ZLayer.fromService(_.api)
   val database: URLayer[Has[AppConfig], Has[DatabaseConfig]] = ZLayer.fromService(_.database)
-  val doobiePostgresContext: ULayer[Has[Postgres[Literal]]] = ZLayer.fromFunction(_ => new DoobieContext.Postgres(Literal))
+  val doobiePostgresContext: ULayer[Has[Postgres[Literal]]] =
+    ZLayer.fromFunction(_ => new DoobieContext.Postgres(Literal))
 
   object Configuration {
     val configDescription = DeriveConfigDescriptor.descriptor[AppConfig]

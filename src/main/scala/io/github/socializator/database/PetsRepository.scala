@@ -62,7 +62,7 @@ object PetsRepository extends Serializable {
 
   val live: URLayer[Has[Transactor[Task]] with Has[Postgres[Literal]], Has[PetsRepository.Service]] = {
     val service = for {
-      transactor <- ZIO.access[Has[Transactor[Task]]](_.get)
+      transactor      <- ZIO.access[Has[Transactor[Task]]](_.get)
       postgresContext <- ZIO.access[Has[Postgres[Literal]]](_.get)
     } yield new PetsRepository(transactor, postgresContext).service
     service.toLayer

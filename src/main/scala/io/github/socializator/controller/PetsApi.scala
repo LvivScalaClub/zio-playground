@@ -18,16 +18,17 @@ object PetsApi {
 
     val handler = new PetsHandler[AppTask] {
       def createPets(respond: CreatePetsResponse.type)(body: PetPostDTO): AppTask[CreatePetsResponse] = {
-        PetsRepository.insert(body).map(CreatePetsResponse.Ok)
+        PetsRepository.insert(body).map(CreatePetsResponse.Created)
       }
 
       def listPets(respond: ListPetsResponse.type)(
           limit: Option[Int]
       ): AppTask[ListPetsResponse] = ???
-      def showPetById(respond: ShowPetByIdResponse.type)(petId: BigDecimal): AppTask[ShowPetByIdResponse] = {
+
+      def showPetById(respond: ShowPetByIdResponse.type)(petId: BigInt): AppTask[ShowPetByIdResponse] = {
         PetsRepository.get(petId.longValue).map {
           case Some(value) => ShowPetByIdResponse.Ok(value)
-          case None => ShowPetByIdResponse.BadRequest(s"Pet was not found for id: $petId")
+          case None        => ShowPetByIdResponse.BadRequest(s"Pet was not found for id: $petId")
         }
       }
     }

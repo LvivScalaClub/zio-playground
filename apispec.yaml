@@ -73,7 +73,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     Pet:
@@ -102,7 +102,7 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Pet"
-    Error:
+    ApiError:
       type: object
       required:
         - code

@@ -14,7 +14,7 @@ object PetsRepositoryMock extends Mock[HasPetsRepository] {
     ZLayer.fromServiceM { proxy =>
       withRuntime.map { rts =>
         new PetsRepository.Service {
-//          def insert(body: PetPostDTO): Task[Pet]
+
           override def insert(body: PetPostDTO): Task[Pet] =
             proxy(Insert, body)
 

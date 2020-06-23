@@ -57,5 +57,13 @@ package object database {
           transactor <- mkHikariTransactor(cfg)
         } yield transactor
       }
+
+    val test: ZLayer[Has[Blocking.Service] with Has[DatabaseConfig], Throwable, Has[Transactor[Task]]] =
+      ZLayer.fromManaged {
+        for {
+          cfg        <- ZIO.access[Has[DatabaseConfig]](_.get).toManaged_
+          transactor <- mkHikariTransactor(cfg)
+        } yield transactor
+      }
   }
 }

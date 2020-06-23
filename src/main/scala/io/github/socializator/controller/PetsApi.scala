@@ -14,7 +14,7 @@ import io.github.socializator.generated.server.pets.ShowPetByIdResponse
 
 object PetsApi {
 
-  def routes[R <: Has[PetsRepository.Service]]: HttpRoutes[RIO[R, *]] = {
+  def routes[R <: HasPetsRepository]: HttpRoutes[RIO[R, *]] = {
     type AppTask[A] = RIO[R, A]
 
     val handler = new PetsHandler[AppTask] {

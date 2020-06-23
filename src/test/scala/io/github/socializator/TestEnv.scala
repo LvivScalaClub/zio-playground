@@ -13,7 +13,7 @@ object TestEnv {
   val databaseConfig = Configuration.live >>> database
   val apiConfig      = Configuration.live >>> api
   val transactor     = (Blocking.any ++ databaseConfig) >>> AppTransactor.test
-  val petsRepository = transactor >>> PetsRepository.live
+  val petsRepository = (transactor ++ doobiePostgresContext) >>> PetsRepository.live
 
   val AppLayer: ZLayer[Blocking, Throwable, AppEnv] = {
     Blocking.any >>> (Configuration.live ++ AppLogging.live ++ databaseConfig ++ apiConfig ++ transactor ++ petsRepository)

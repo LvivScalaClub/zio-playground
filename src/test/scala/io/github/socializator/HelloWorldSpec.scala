@@ -7,18 +7,16 @@ import zio.test._
 import zio.test.Assertion._
 import zio.test.mock.Expectation._
 import zio.test.environment._
-
 import io.circe.Decoder
 import io.circe.literal._
 import org.http4s.circe._
 import org.http4s.implicits._
-import org.http4s.{ Status, _ }
+import org.http4s.{Status, _}
 import org.http4s._
 import org.http4s.implicits._
-
 import io.github.socializator.PetsRepositoryMock.Insert
 import io.github.socializator.database.PetsRepository.HasPetsRepository
-import io.github.socializator.generated.server.definitions.Pet
+import io.github.socializator.generated.server.definitions.{Pet, PetPostDTO}
 import io.github.socializator.controller.PetsApi
 
 // val app = TodoService.routes[TodoRepository]("").orNotFound
@@ -66,7 +64,10 @@ object HelloWorldSpec extends DefaultRunnableSpec {
 
   val PetsRepositoryMockEnv: ULayer[HasPetsRepository] = (
     Insert(
-      equalTo(("name", Some("tag"))),
+      equalTo(PetPostDTO(
+        "name",
+        Some("tag")
+      )),
       value(
         Pet(
           0,

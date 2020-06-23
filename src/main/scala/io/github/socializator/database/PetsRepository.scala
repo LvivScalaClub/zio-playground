@@ -48,6 +48,9 @@ final class PetsRepository(transactor: Transactor[Task], doobieContext: Postgres
 }
 
 object PetsRepository extends Serializable {
+  type HasPetsRepository = Has[PetsRepository.Service]
+
+
   def insert(body: PetPostDTO): RIO[Has[PetsRepository.Service], Pet] =
     ZIO.accessM(_.get.insert(body))
 

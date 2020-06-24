@@ -6,6 +6,7 @@ import org.http4s._
 import io.github.socializator.generated.server.pets.PetsHandler
 import io.github.socializator.generated.server.pets.PetsResource
 import io.github.socializator.database.PetsRepository
+import io.github.socializator.database.PetsRepository.HasPetsRepository
 import io.github.socializator.error.{InternalAppError, PetNotFoundError}
 import io.github.socializator.generated.server.definitions.PetPostDTO
 import io.github.socializator.generated.server.pets.CreatePetsResponse

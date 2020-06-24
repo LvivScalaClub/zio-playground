@@ -38,8 +38,8 @@ object HelloWorldSpec extends DefaultRunnableSpec {
       }
     ).provideSomeLayer[ZEnv](
       PetsRepositoryMockEnv
-// todo
-//      InMemoryTodoRepository.layer
+      // todo
+      // InMemoryTodoRepository.layer
     )
 
   val PetsRepositoryMockEnv: ULayer[HasPetsRepository] =

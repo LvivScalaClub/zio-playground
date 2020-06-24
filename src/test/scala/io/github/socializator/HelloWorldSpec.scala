@@ -32,14 +32,12 @@ object HelloWorldSpec extends DefaultRunnableSpec {
 
         val io = app.run(req)
 
-        assertM(io.map { r =>
-          r.status
-        })(equalTo(Status.Created))
+        assertM(io.map(_.status))(equalTo(Status.Created))
       }
     ).provideSomeLayer[ZEnv](
-      PetsRepositoryMockEnv
+      InMemoryTodoRepository.layer
       // todo
-      // InMemoryTodoRepository.layer
+      // PetsRepositoryMockEnv
     )
 
   val PetsRepositoryMockEnv: ULayer[HasPetsRepository] =

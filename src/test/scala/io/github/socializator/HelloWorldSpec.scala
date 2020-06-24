@@ -34,7 +34,7 @@ object HelloWorldSpec extends DefaultRunnableSpec {
 
         assertM(io.map { r =>
           r.status
-        })(equalTo(Status.BadRequest))
+        })(equalTo(Status.Created))
       }
     ).provideSomeLayer[ZEnv](
       PetsRepositoryMockEnv

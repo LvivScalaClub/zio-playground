@@ -6,6 +6,7 @@ import org.http4s._
 import io.github.socializator.generated.server.pets.PetsHandler
 import io.github.socializator.generated.server.pets.PetsResource
 import io.github.socializator.database.PetsRepository
+import io.github.socializator.database.PetsRepository.HasPetsRepository
 import io.github.socializator.error.{InternalAppError, PetNotFoundError}
 import io.github.socializator.generated.server.definitions.PetPostDTO
 import io.github.socializator.generated.server.pets.CreatePetsResponse
@@ -14,7 +15,7 @@ import io.github.socializator.generated.server.pets.ShowPetByIdResponse
 
 object PetsApi {
 
-  def routes[R <: Has[PetsRepository.Service]]: HttpRoutes[RIO[R, *]] = {
+  def routes[R <: HasPetsRepository]: HttpRoutes[RIO[R, *]] = {
     type AppTask[A] = RIO[R, A]
 
     val handler = new PetsHandler[AppTask] {

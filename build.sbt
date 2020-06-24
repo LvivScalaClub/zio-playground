@@ -1,11 +1,11 @@
-val ZioVersion            = "1.0.0-RC20"
+val ZioVersion            = "1.0.0-RC21"
 val Specs2Version         = "4.7.0"
 val Http4sVersion         = "0.21.3"
 val CirceVersion          = "0.13.0"
 val LogbackVersion        = "1.2.3"
 val ZioInteropCatsVersion = "2.1.3.0-RC15"
 val ZioLoggingVersion     = "0.3.0"
-val ZioConfigVersion      = "1.0.0-RC20"
+val ZioConfigVersion      = ZioVersion
 val PostgresqlVersion     = "42.2.12"
 val DoobieVersion         = "0.9.0"
 val FlywayVersion         = "6.4.3"
@@ -16,6 +16,8 @@ lazy val Http4sClient      = "org.http4s"    %% "http4s-client"       % Http4sVe
 lazy val Http4sCirce       = "org.http4s"    %% "http4s-circe"        % Http4sVersion
 lazy val Http4sDsl         = "org.http4s"    %% "http4s-dsl"          % Http4sVersion
 lazy val CirceGeneric      = "io.circe"      %% "circe-generic"       % CirceVersion
+lazy val CirceLiteral      = "io.circe"      %% "circe-literal"       % CirceVersion % "test"
+
 lazy val Zio               = "dev.zio"       %% "zio"                 % ZioVersion
 lazy val ZioTest           = "dev.zio"       %% "zio-test"            % ZioVersion    % Test
 lazy val ZioTestSbt        = "dev.zio"       %% "zio-test-sbt"        % ZioVersion    % Test
@@ -58,6 +60,7 @@ lazy val root = (project in file("."))
       ZioConfigMagnolia,
       Specs2Core,
       CirceGeneric,
+      CirceLiteral,
       Http4sBlazeServer,
       Http4sClient,
       Http4sCirce,

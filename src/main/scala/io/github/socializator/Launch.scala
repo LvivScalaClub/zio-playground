@@ -8,14 +8,11 @@ import org.http4s.server.middleware.CORS
 import zio._
 import zio.blocking.Blocking
 import zio.clock.Clock
-import zio.console.putStrLn
 import zio.interop.catz._
 import cats.effect.{ExitCode => CatsExitCode}
-import io.github.socializator.generated.server.pets.PetsResource
 import zio.logging._
-import zio.config.{config, Config}
+import zio.config.config
 import io.github.socializator.configuration._
-import io.github.socializator.logging.AppLogging
 import io.github.socializator.database._
 import io.github.socializator.controller.PetsApi
 import doobie.util.transactor.Transactor
